@@ -11,6 +11,6 @@ repository = "https://github.com/levpaul/lcd1602-rs"
 readme = "README.md"
 
 [dependencies]
-embedded-hal = "0.2.5"
-nb = "1.0.0"
+embedded-hal = "1.0.0"
+nb = "1.1.0"
 

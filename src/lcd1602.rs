@@ -5,8 +5,8 @@ use crate::error::Error::{InvalidCursorPos, UnsupportedBusWidth};
 use crate::lcd1602::BusWidth::FourBits;
 use crate::lcd1602::Direction::RightToLeft;
 use core::time::Duration;
-use embedded_hal::digital::v2::OutputPin;
-use embedded_hal::timer::CountDown;
+use embedded_hal::delay::DelayNs;
+use embedded_hal::digital::OutputPin;
 use nb::block;
 
 impl<EN, RS, D4, D5, D6, D7, Timer, E> LCD1602<EN, RS, D4, D5, D6, D7, Timer>
@@ -17,7 +17,7 @@ where
     D5: OutputPin<Error = E>,
     D6: OutputPin<Error = E>,
     D7: OutputPin<Error = E>,
-    Timer: CountDown<Time = Duration>,
+    Timer: DelayNs
 {
     pub fn new(
         en: EN,
@@ -66,7 +66,7 @@ where
         screen_edge_tracking: bool,
     ) -> Result<(), Error<E>> {
         let mut cmd = 0x04;
-        if text_direction == Direction::RightToLeft {
+        if text_direction == RightToLeft {
             cmd |= 0x02;
         }
         if screen_edge_tracking {
