@@ -1,13 +1,13 @@
 [package]
 name = "lcd1602-rs"
 version = "0.1.0"
-authors = ["Levi Lovelock <lovelock.levi@gmail.com>"]
+authors = ["Levi Lovelock <lovelock.levi@gmail.com>", "QPCrummer"]
 edition = "2018"
 keywords =["no-std", "driver", "embedded-hal", "hd44780", "teensy"]
 categories = ["embedded", "hardware-support", "no-std"]
 description = "A crate to drive a 1602 LCD via an embedded-hal implementation"
 license = "MIT"
-repository = "https://github.com/levpaul/lcd1602-rs"
+repository = "https://github.com/QPCrummer/lcd1602-rs"
 readme = "README.md"
 
 [dependencies]
