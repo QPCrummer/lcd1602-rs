@@ -4,10 +4,8 @@ use crate::LCD1602;
 use crate::error::Error::{InvalidCursorPos, UnsupportedBusWidth};
 use crate::lcd1602::BusWidth::FourBits;
 use crate::lcd1602::Direction::RightToLeft;
-use core::time::Duration;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
-use nb::block;
 
 impl<EN, RS, D4, D5, D6, D7, Timer, E> LCD1602<EN, RS, D4, D5, D6, D7, Timer>
 where
@@ -42,7 +40,7 @@ where
     }
 
     fn init(&mut self) -> Result<(), Error<E>> {
-        self.delay(50000)?;
+        self.delay(50000);
         self.set_bus_width(FourBits)?;
 
         self.command(0x0C)?; // Display mode
@@ -55,7 +53,8 @@ where
         match bus_width {
             FourBits => {
                 self.write_bus(0x02)?;
-                self.delay(39)
+                self.delay(39);
+                Ok(())
             }
             _ => Err(UnsupportedBusWidth),
         }
@@ -73,7 +72,8 @@ where
             cmd |= 0x01;
         }
         self.command(cmd)?;
-        self.delay(39)
+        self.delay(39);
+        Ok(())
     }
 
     pub fn set_position(
@@ -84,11 +84,13 @@ where
         match (x,y) {
             (0..=15, 0) => {
                 self.command(0x80 | x)?;
-                self.delay(1530)
+                self.delay(1530);
+                Ok(())
             },
             (0..=15, 1) => {
                 self.command(0x80 | (x + 0x40))?;
-                self.delay(1530)
+                self.delay(1530);
+                Ok(())
             },
             _ => Err(InvalidCursorPos)
         }
@@ -96,12 +98,14 @@ where
 
     pub fn clear(&mut self) -> Result<(), Error<E>> {
         self.command(0x01)?;
-        self.delay(1530)
+        self.delay(1530);
+        Ok(())
     }
 
     pub fn home(&mut self) -> Result<(), Error<E>> {
         self.command(0x02)?;
-        self.delay(1530)
+        self.delay(1530);
+        Ok(())
     }
 
     fn command(&mut self, cmd: u8) -> Result<(), Error<E>> {
@@ -120,10 +124,11 @@ where
 
     pub fn print(&mut self, s: &str) -> Result<(), Error<E>> {
         for ch in s.chars() {
-            self.delay(320)?; // per char delay
+            self.delay(320); // per char delay
             self.write_char(ch as u8)?;
         }
-        self.delay(1530)
+        self.delay(1530);
+        Ok(())
     }
 
     fn write_bus(&mut self, data: u8) -> Result<(), Error<E>> {
@@ -149,12 +154,8 @@ where
         Ok(())
     }
 
-    pub fn delay(&mut self, interval_us: u64) -> Result<(), Error<E>> {
-        self.timer.start(Duration::from_micros(interval_us));
-        match block!(self.timer.wait()) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(Error::TimerError),
-        }
+    pub fn delay(&mut self, interval_us: u32) {
+        self.timer.delay_us(interval_us);
     }
 }
 
